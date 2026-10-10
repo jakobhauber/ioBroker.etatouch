@@ -1,6 +1,6 @@
 {
   "name": "iobroker.etatouch",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "ioBroker-Adapter für ETA-Heizungen (ETAtouch RESTful Webservices)",
   "author": {
     "name": "Jakob Hauber"

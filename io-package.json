@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "etatouch",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "news": {
+      "0.1.2": {
+        "en": "New adapter icon",
+        "de": "Neues Adapter-Icon"
+      },
       "0.1.1": {
         "en": "Skip data points the heating denies access to (Invalid permission), retry on timeouts, keep data of temporarily locked nodes",
         "de": "Datenpunkte ohne Zugriff (Invalid permission) werden übersprungen, Wiederholung bei Timeouts, Datenpunkte vorübergehend gesperrter Knoten bleiben erhalten"
@@ -32,9 +36,9 @@
     "license": "MIT",
     "platform": "Javascript/Node.js",
     "main": "main.js",
-    "icon": "etatouch.svg",
+    "icon": "etatouch.png",
     "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/jakobhauber/ioBroker.etatouch/main/admin/etatouch.svg",
+    "extIcon": "https://raw.githubusercontent.com/jakobhauber/ioBroker.etatouch/main/admin/etatouch.png",
     "readme": "https://github.com/jakobhauber/ioBroker.etatouch/blob/main/README.md",
     "loglevel": "info",
     "mode": "daemon",

@@ -51,6 +51,9 @@ Bei Anlagen mit mehreren CAN-Knoten kann die Heizung den Zugriff auf einzelne Kn
 
 ## Changelog
 
+### 0.1.2
+- Neues Adapter-Icon (ETA-Logo)
+
 ### 0.1.1
 - Datenpunkte ohne Zugriff (Invalid permission) werden übersprungen statt leer angelegt
 - Wiederholung bei Timeouts, stündlicher Neuversuch für nicht abrufbare Variablen
