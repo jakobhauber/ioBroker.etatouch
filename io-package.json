@@ -1,0 +1,132 @@
+{
+  "common": {
+    "name": "etatouch",
+    "version": "0.1.0",
+    "news": {
+      "0.1.0": {
+        "en": "Initial release",
+        "de": "Erste Version"
+      }
+    },
+    "titleLang": {
+      "en": "ETA heating (ETAtouch)",
+      "de": "ETA Heizung (ETAtouch)"
+    },
+    "desc": {
+      "en": "Reads all data points of an ETA heating via the ETAtouch REST API",
+      "de": "Liest alle Datenpunkte einer ETA-Heizung über die ETAtouch REST-API"
+    },
+    "authors": ["Jakob Hauber"],
+    "keywords": ["eta", "etatouch", "heizung", "heating"],
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "main": "main.js",
+    "icon": "etatouch.svg",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/jakobhauber/ioBroker.etatouch/main/admin/etatouch.svg",
+    "readme": "https://github.com/jakobhauber/ioBroker.etatouch/blob/main/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "climate-control",
+    "compact": true,
+    "connectionType": "local",
+    "dataSource": "poll",
+    "messagebox": true,
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=5.0.19"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=6.0.0"
+      }
+    ],
+    "tier": 3
+  },
+  "native": {
+    "host": "",
+    "port": 8080,
+    "interval": 300,
+    "writeEnabled": false
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Verbindung zur Heizung",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.apiVersion",
+      "type": "state",
+      "common": {
+        "role": "text",
+        "name": "API-Version der ETA",
+        "type": "string",
+        "read": true,
+        "write": false,
+        "def": ""
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.structureStatus",
+      "type": "state",
+      "common": {
+        "role": "text",
+        "name": "Status XML-Struktur einlesen",
+        "type": "string",
+        "read": true,
+        "write": false,
+        "def": ""
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.errors",
+      "type": "state",
+      "common": {
+        "role": "json",
+        "name": "Aktive Meldungen (JSON)",
+        "type": "string",
+        "read": true,
+        "write": false,
+        "def": "[]"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.errorCount",
+      "type": "state",
+      "common": {
+        "role": "value",
+        "name": "Anzahl aktiver Meldungen",
+        "type": "number",
+        "read": true,
+        "write": false,
+        "def": 0
+      },
+      "native": {}
+    }
+  ]
+}

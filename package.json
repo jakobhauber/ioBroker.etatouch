@@ -1,0 +1,48 @@
+{
+  "name": "iobroker.etatouch",
+  "version": "0.1.0",
+  "description": "ioBroker-Adapter für ETA-Heizungen (ETAtouch RESTful Webservices)",
+  "author": {
+    "name": "Jakob Hauber"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/jakobhauber/ioBroker.etatouch",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jakobhauber/ioBroker.etatouch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jakobhauber/ioBroker.etatouch/issues"
+  },
+  "keywords": [
+    "ioBroker",
+    "eta",
+    "etatouch",
+    "heizung",
+    "heating"
+  ],
+  "main": "main.js",
+  "files": [
+    "admin/",
+    "lib/",
+    "main.js",
+    "io-package.json",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@iobroker/adapter-core": "^3.2.3",
+    "fast-xml-parser": "^4.5.0"
+  },
+  "devDependencies": {
+    "@iobroker/testing": "^5.0.4",
+    "mocha": "^10.8.2"
+  },
+  "scripts": {
+    "test:package": "mocha test/package.js --exit",
+    "test:unit": "mocha test/structure.test.js --exit",
+    "test": "npm run test:unit && npm run test:package"
+  }
+}

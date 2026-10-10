@@ -1,0 +1,69 @@
+{
+  "i18n": false,
+  "type": "panel",
+  "items": {
+    "host": {
+      "type": "text",
+      "label": "IP-Adresse der ETA-Heizung",
+      "help": "z.B. 192.168.2.160 (LAN-Zugriff muss an der Heizung aktiviert sein)",
+      "xs": 12,
+      "sm": 8,
+      "md": 4,
+      "lg": 4
+    },
+    "port": {
+      "type": "number",
+      "label": "Port",
+      "min": 1,
+      "max": 65535,
+      "xs": 12,
+      "sm": 4,
+      "md": 2,
+      "lg": 2
+    },
+    "interval": {
+      "newLine": true,
+      "type": "number",
+      "label": "Abfrageintervall (Sekunden)",
+      "min": 10,
+      "max": 86400,
+      "xs": 12,
+      "sm": 6,
+      "md": 3,
+      "lg": 3
+    },
+    "writeEnabled": {
+      "newLine": true,
+      "type": "checkbox",
+      "label": "Schreiben erlauben (Werte vom ioBroker an die Heizung senden)",
+      "help": "Standardmäßig aus. Wenn aktiv, sind Datenpunkte schreibbar, die laut Heizung veränderbar sind.",
+      "xs": 12
+    },
+    "structureHeader": {
+      "newLine": true,
+      "type": "header",
+      "text": "XML-Struktur",
+      "size": 4
+    },
+    "structureInfo": {
+      "newLine": true,
+      "type": "staticText",
+      "text": "Die Menüstruktur ist bei jeder Heizung anders. Mit dem Button wird die XML-Struktur der Heizung eingelesen und die Objekte im ioBroker angelegt bzw. aktualisiert. Vorher IP speichern, die Instanz muss laufen. Das Einlesen dauert je nach Anlage 10–15 Minuten und läuft im Hintergrund weiter – Fortschritt im Log bzw. im Datenpunkt etatouch.0.info.structureStatus. Währenddessen die Instanz nicht neu starten.",
+      "xs": 12
+    },
+    "readStructure": {
+      "newLine": true,
+      "type": "sendTo",
+      "command": "readStructure",
+      "label": "XML-Struktur einlesen",
+      "variant": "contained",
+      "showProcess": true,
+      "timeout": 30000,
+      "jsonData": "{\"host\": \"${data.host}\", \"port\": \"${data.port}\"}",
+      "xs": 12,
+      "sm": 6,
+      "md": 4,
+      "lg": 3
+    }
+  }
+}
