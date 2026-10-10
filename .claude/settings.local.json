@@ -4,7 +4,15 @@
       "Bash(git add *)",
       "Bash(git commit -q -m 'Initial version of ioBroker ETA adapter \\(ETAtouch REST API\\) *)",
       "Bash(git remote *)",
-      "Bash(git ls-remote *)"
+      "Bash(git ls-remote *)",
+      "Bash(git fetch *)",
+      "Bash(git ls-tree *)",
+      "Bash(git merge *)",
+      "Bash(git push *)",
+      "Bash(node -e ' *)",
+      "Bash(node --check main.js)",
+      "Bash(npm test *)",
+      "Bash(git commit -q -m 'Skip inaccessible variables \\(Invalid permission\\), add retries *)"
     ]
   }
 }

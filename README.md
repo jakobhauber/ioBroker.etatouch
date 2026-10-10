@@ -45,7 +45,15 @@ Standardmäßig **aus**. Mit „Schreiben erlauben“ werden alle Datenpunkte sc
 
 Nach dem Schreiben wird der Wert sofort neu von der Heizung gelesen.
 
+## Hinweis: „Invalid permission“
+
+Bei Anlagen mit mehreren CAN-Knoten kann die Heizung den Zugriff auf einzelne Knoten verweigern (Antwort `Invalid permission`), zeitweise fehlen diese Funktionsblöcke auch im Menü. Solche Datenpunkte werden beim Einlesen übersprungen (Warnung im Log). Wurden sie früher schon einmal erfolgreich eingelesen, bleiben die Objekte erhalten und der Adapter versucht stündlich, sie wieder abzufragen. Ist der Knoten wieder erreichbar, einfach erneut „XML-Struktur einlesen“ drücken.
+
 ## Changelog
+
+### 0.1.1
+- Datenpunkte ohne Zugriff (Invalid permission) werden übersprungen statt leer angelegt
+- Wiederholung bei Timeouts, stündlicher Neuversuch für nicht abrufbare Variablen
 
 ### 0.1.0
 - Erste Version

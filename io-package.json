@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "etatouch",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "news": {
+      "0.1.1": {
+        "en": "Skip data points the heating denies access to (Invalid permission), retry on timeouts, keep data of temporarily locked nodes",
+        "de": "Datenpunkte ohne Zugriff (Invalid permission) werden übersprungen, Wiederholung bei Timeouts, Datenpunkte vorübergehend gesperrter Knoten bleiben erhalten"
+      },
       "0.1.0": {
         "en": "Initial release",
         "de": "Erste Version"
@@ -16,8 +20,15 @@
       "en": "Reads all data points of an ETA heating via the ETAtouch REST API",
       "de": "Liest alle Datenpunkte einer ETA-Heizung über die ETAtouch REST-API"
     },
-    "authors": ["Jakob Hauber"],
-    "keywords": ["eta", "etatouch", "heizung", "heating"],
+    "authors": [
+      "Jakob Hauber"
+    ],
+    "keywords": [
+      "eta",
+      "etatouch",
+      "heizung",
+      "heating"
+    ],
     "license": "MIT",
     "platform": "Javascript/Node.js",
     "main": "main.js",

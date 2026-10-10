@@ -2,7 +2,7 @@
 
 const utils = require('@iobroker/adapter-core');
 const { EtaClient, mapLimit } = require('./lib/etaClient');
-const { collectUris, buildObjects, toStateValue, toWriteParams } = require('./lib/structure');
+const { collectUris, buildObjects, nodeOf, toStateValue, toWriteParams } = require('./lib/structure');
 
 const VARSET = 'ioBroker';
 const PARALLEL = 4;
@@ -20,6 +20,8 @@ class Etatouch extends utils.Adapter {
         this.pollTimer = null;
         this.busy = false;
         this.varsetReady = false;
+        this.varsetFailed = 0;
+        this.varsetTime = 0;
         this.stopped = false;
 
         this.on('ready', this.onReady.bind(this));
@@ -100,19 +102,48 @@ class Etatouch extends utils.Adapter {
             // varset did not exist
         }
         await client.createVarset(VARSET);
+        /** @type {Map<string, number>} node -> number of failed variables */
+        const failedNodes = new Map();
         let failed = 0;
         await mapLimit(uris, PARALLEL, async uri => {
             try {
-                await client.addToVarset(VARSET, uri);
+                await this.withRetry(() => client.addToVarset(VARSET, uri));
             } catch (err) {
                 failed++;
+                failedNodes.set(nodeOf(uri), (failedNodes.get(nodeOf(uri)) || 0) + 1);
                 this.log.debug(`Variable ${uri} konnte nicht zum Varset hinzugefügt werden: ${err.message}`);
             }
         });
         if (failed) {
-            this.log.warn(`${failed} von ${uris.length} Variablen konnten nicht zum Varset hinzugefügt werden`);
+            const detail = [...failedNodes].map(([node, n]) => `Knoten ${node}: ${n}`).join(', ');
+            this.log.warn(
+                `${failed} von ${uris.length} Variablen sind auf der Heizung nicht abrufbar (${detail}). Neuer Versuch in einer Stunde.`,
+            );
         }
+        this.varsetFailed = failed;
+        this.varsetTime = Date.now();
         this.log.debug(`Varset ${VARSET} mit ${uris.length - failed} Variablen angelegt`);
+    }
+
+    /**
+     * Retries a request on network errors/timeouts (not on errors reported by the heating).
+     *
+     * @template T
+     * @param {() => Promise<T>} fn
+     * @param {number} [attempts]
+     * @returns {Promise<T>}
+     */
+    async withRetry(fn, attempts = 3) {
+        for (let i = 1; ; i++) {
+            try {
+                return await fn();
+            } catch (err) {
+                if (err.status !== 0 || i >= attempts || this.stopped) {
+                    throw err;
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000 * i));
+            }
+        }
     }
 
     /**
@@ -138,6 +169,10 @@ class Etatouch extends utils.Adapter {
         }
         this.busy = true;
         try {
+            // Variables that were not accessible (e.g. "Invalid permission") are retried once per hour
+            if (this.varsetReady && this.varsetFailed && Date.now() - this.varsetTime > 3600000) {
+                this.varsetReady = false;
+            }
             if (!this.varsetReady) {
                 await this.setupVarset(this.client, [...this.states.keys()]);
                 this.varsetReady = true;
@@ -215,7 +250,7 @@ class Etatouch extends utils.Adapter {
                 throw new Error('Adapter wird beendet');
             }
             try {
-                infos.set(uri, await client.getVarInfo(uri));
+                infos.set(uri, await this.withRetry(() => client.getVarInfo(uri)));
             } catch (err) {
                 this.log.debug(`varinfo ${uri}: ${err.message}`);
             }
@@ -234,16 +269,41 @@ class Etatouch extends utils.Adapter {
         const objects = buildObjects(menu, infos, values, !!this.config.writeEnabled);
         const newIds = new Set(objects.map(o => o.id));
 
-        // remove objects that no longer exist on the heating
+        // CAN nodes that answered at least one request in this scan
+        const accessibleNodes = new Set([...infos.keys(), ...values.keys()].map(nodeOf));
+        const lockedNodes = [...new Set(uris.map(nodeOf))].filter(n => !accessibleNodes.has(n));
+        if (lockedNodes.length) {
+            this.log.warn(
+                `Knoten ${lockedNodes.join(', ')}: Heizung verweigert den Zugriff (z.B. "Invalid permission") – diese Datenpunkte werden übersprungen.`,
+            );
+        }
+
+        // Objects of nodes that are currently not accessible are kept if they were read successfully before,
+        // so a temporarily locked node does not lose its data points.
         const existing = await this.getAdapterObjectsAsync();
+        const keepNodes = new Set();
+        for (const obj of Object.values(existing)) {
+            const node = obj.native && obj.native.uri ? nodeOf(obj.native.uri) : '';
+            if (node && !accessibleNodes.has(node) && obj.type === 'state' && obj.native.etaType) {
+                keepNodes.add(node);
+            }
+        }
+
+        // remove objects that no longer exist on the heating
         let removed = 0;
-        for (const fullId of Object.keys(existing)) {
+        for (const [fullId, obj] of Object.entries(existing)) {
             const id = fullId.substring(this.namespace.length + 1);
             if (id === 'info' || id.startsWith('info.') || newIds.has(id)) {
                 continue;
             }
+            if (obj.native && obj.native.uri && keepNodes.has(nodeOf(obj.native.uri))) {
+                continue;
+            }
             await this.delForeignObjectAsync(fullId);
             removed++;
+        }
+        if (keepNodes.size) {
+            this.log.info(`Vorhandene Datenpunkte von Knoten ${[...keepNodes].join(', ')} bleiben erhalten.`);
         }
 
         for (const { id, obj } of objects) {
@@ -252,7 +312,9 @@ class Etatouch extends utils.Adapter {
 
         this.client = client;
         await this.loadStates();
-        this.varsetReady = true;
+        // kept data points of locked nodes are not in the varset yet -> let the next poll rebuild it
+        const scanned = new Set(uris);
+        this.varsetReady = [...this.states.keys()].every(uri => scanned.has(uri));
         await this.applyValues([...values.values()]);
         await this.updateErrors(client);
         await this.setStateAsync('info.connection', true, true);
